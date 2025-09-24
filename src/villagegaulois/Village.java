@@ -8,10 +8,12 @@ public class Village {
 	private Chef chef;
 	private Gaulois[] villageois;
 	private int nbVillageois = 0;
+	private Marche marche;
 
-	public Village(String nom, int nbVillageoisMaximum) {
+	public Village(String nom, int nbVillageoisMaximum, int nb_etal) {
 		this.nom = nom;
 		villageois = new Gaulois[nbVillageoisMaximum];
+		this.marche = new Marche(nb_etal);
 	}
 
 	public String getNom() {
@@ -61,7 +63,7 @@ public class Village {
 		private Etal[] etals;
 		private int nb_etal = 0;
 		
-		private void Marche(int nb_etal) {
+		private Marche(int nb_etal) {
 			this.nb_etal = nb_etal;
 			etals = new Etal[nb_etal];
 		}
@@ -72,7 +74,7 @@ public class Village {
 		
 		private int trouverEtalLibre() {
 			for (int i = 0; i < this.nb_etal; i++) {
-				if (!etals[i].isEtalOccupe())
+				if (etals[i] != null && !etals[i].isEtalOccupe())
 					return i;
 			}
 			return -1;
@@ -97,5 +99,57 @@ public class Village {
 			sb.append("Il reste " + nbEtalVide + " étals non utilisés dans le marché.\n");
 			return sb.toString();
 		}
+	}
+	
+	public String installerVendeur(Gaulois vendeur, String produit, int nbProduit) {
+		StringBuilder sb = new StringBuilder();
+		int etalLibre = this.marche.trouverEtalLibre();
+		if (etalLibre == -1) {
+			return "Pas d'Etal libre " + vendeur.getNom() + " rentre bredouille";
+		}
+		sb.append(vendeur.getNom());
+		sb.append(" cherche un endroit pour vendre ");
+		sb.append(nbProduit);
+		sb.append(produit);
+		this.marche.utiliserEtal(etalLibre, vendeur, produit, nbProduit);
+		sb.append("\nLe vendeur");
+		sb.append(vendeur.getNom());
+		sb.append("vend des ");
+		sb.append(produit);
+		sb.append("à l'étal n°");
+		sb.append(etalLibre);
+		return sb.toString();
+	}
+	
+	public String rechercherVendeursProduit(String produit) {
+		StringBuilder sb = new StringBuilder();
+		Gaulois[] tab = new Gaulois[this.marche.nb_etal];
+		int nbVendeur = 0;
+		for (int i = 0; i < this.marche.nb_etal; i++) {
+			if (this.marche.etals[i] != null && this.marche.etals[i].contientProduit(produit)) {
+				tab[nbVendeur] = this.marche.etals[i].getVendeur();
+				nbVendeur++;
+			}
+		}
+		switch(nbVendeur) {
+			case 0:
+				sb.append("Il n'y a pas de vendeur qui propose des ");
+				sb.append(produit);
+				sb.append(" au marché.");
+				break;
+			case 1:
+				sb.append("Seul le vendeur ");
+				sb.append(tab[0].getNom());
+				sb.append(" propose des fleurs au marché.");
+				break;
+			default:
+				sb.append("Les vendeurs qui proposent des fleurs sont :");
+				for (int i = 0; i < nbVendeur; i++) {
+					sb.append("\n- ");
+					sb.append(tab[i].getNom());
+				}
+				break;
+		}
+		return sb.toString();
 	}
 }
