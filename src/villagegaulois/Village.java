@@ -66,6 +66,9 @@ public class Village {
 		private Marche(int nb_etal) {
 			this.nb_etal = nb_etal;
 			etals = new Etal[nb_etal];
+			for (int i = 0; i < nb_etal; i++) {
+	            etals[i] = new Etal();
+	        }
 		}
 		
 		private void utiliserEtal(int indiceEtal, Gaulois vendeur, String produit, int nbProduit) {
@@ -73,8 +76,8 @@ public class Village {
 		}
 		
 		private int trouverEtalLibre() {
-			for (int i = 0; i < this.nb_etal; i++) {
-				if (etals[i] != null && !etals[i].isEtalOccupe())
+			for (int i = 1; i < this.nb_etal; i++) {
+				if (!etals[i].isEtalOccupe())
 					return i;
 			}
 			return -1;
@@ -110,14 +113,17 @@ public class Village {
 		sb.append(vendeur.getNom());
 		sb.append(" cherche un endroit pour vendre ");
 		sb.append(nbProduit);
+		sb.append(" ");
 		sb.append(produit);
+		sb.append(".");
 		this.marche.utiliserEtal(etalLibre, vendeur, produit, nbProduit);
-		sb.append("\nLe vendeur");
+		sb.append("\nLe vendeur ");
 		sb.append(vendeur.getNom());
-		sb.append("vend des ");
+		sb.append(" vend des ");
 		sb.append(produit);
-		sb.append("à l'étal n°");
+		sb.append(" à l'étal n°");
 		sb.append(etalLibre);
+		sb.append(".\n");
 		return sb.toString();
 	}
 	
@@ -126,7 +132,7 @@ public class Village {
 		Gaulois[] tab = new Gaulois[this.marche.nb_etal];
 		int nbVendeur = 0;
 		for (int i = 0; i < this.marche.nb_etal; i++) {
-			if (this.marche.etals[i] != null && this.marche.etals[i].contientProduit(produit)) {
+			if (this.marche.etals[i].contientProduit(produit)) {
 				tab[nbVendeur] = this.marche.etals[i].getVendeur();
 				nbVendeur++;
 			}
@@ -150,6 +156,26 @@ public class Village {
 				}
 				break;
 		}
+		sb.append("\n");
 		return sb.toString();
 	}
+	
+	 public Etal rechercherEtal(Gaulois vendeur) {
+		 for (int i = 1; i < this.marche.nb_etal; i++) {
+			 if (this.marche.etals[i].getVendeur() == vendeur)
+				 return this.marche.etals[i];
+		 }
+		 return null;
+	 }
+	 
+	 public String partirVendeur(Gaulois vendeur) {
+		 String msg;
+		 Etal etal = this.rechercherEtal(vendeur);
+		 msg = etal.libererEtal();
+		 return msg;
+	 }
+	 
+	 public String afficherMarche() {
+		 return this.marche.afficherMarche();
+	 }
 }
