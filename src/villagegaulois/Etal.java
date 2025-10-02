@@ -55,28 +55,35 @@ public class Etal {
 	}
 
 	public String acheterProduit(int quantiteAcheter, Gaulois acheteur) {
-		if (etalOccupe) {
+		try {
 			StringBuilder chaine = new StringBuilder();
 			chaine.append(acheteur.getNom() + " veut acheter " + quantiteAcheter
 					+ " " + produit + " à " + vendeur.getNom());
-			if (quantite == 0) {
+			if (quantiteAcheter < 0)
+				throw new IllegalArgumentException("la quantité doit être positive");
+			else if (!this.isEtalOccupe())
+				throw new IllegalStateException("l’étal doit être occupé");
+			else if (quantite == 0) {
 				chaine.append(", malheureusement il n'y en a plus !");
 				quantiteAcheter = 0;
 			}
-			if (quantiteAcheter > quantite) {
+			else if (quantiteAcheter > quantite) {
 				chaine.append(", comme il n'y en a plus que " + quantite + ", "
 						+ acheteur.getNom() + " vide l'étal de "
 						+ vendeur.getNom() + ".\n");
 				quantiteAcheter = quantite;
 				quantite = 0;
 			}
-			if (quantite != 0) {
+			else if (quantite != 0) {
 				quantite -= quantiteAcheter;
 				chaine.append(". " + acheteur.getNom()
 						+ ", est ravi de tout trouver sur l'étal de "
 						+ vendeur.getNom() + "\n");
 			}
 			return chaine.toString();
+		}
+		catch (java.lang.NullPointerException e) {
+			System.err.println("Une erreur est survenue durant l'exécution, (Acheteur null)\n" + e);
 		}
 		return null;
 	}
